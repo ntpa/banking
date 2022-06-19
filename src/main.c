@@ -58,74 +58,41 @@ int main(int argc, char* argv[]) {
       number_entries++;
     }
     
-    /*
-     *  The only fields I want for future programs.
-     * Of course, easily can be done with an awk command
-     * but I wanted more C experience 
-     * 
-     */ 
-    int amounts[number_entries];
-    int balances[number_entries];
-    char *dates[number_entries]; 
 
-    for (size_t i= 0; i < number_entries; i++) {
-      amounts[i] = 0; 
-      balances[i] = 0; 
-    }
-
-    size_t j = 0; 
     fseek(p_inputfile, 0, SEEK_SET);    
+    // allocate entries array
+    struct Entry *entries[number_entries]; 
 
-    while (fgets(statement, STATEMENT_LENGTH, p_inputfile)) { 
-      struct Entry *pentry = create_entry(statement);
-      if (pentry) {
-       
+    for (size_t j = 0; fgets(statement, STATEMENT_LENGTH, p_inputfile); j++) { 
+      // dynamic memory returned
+      entries[j] = create_entry(statement);
+      if (entries[j]) {
          /* Process Entry */   
-        amounts[j] = get_amount(pentry);
-        balances[j] = get_balance(pentry); 
-        dates[j] = get_date(pentry);
-  
-        // As described earlier, only care about Date, Amount, Balance
-        fprintf(p_outputfile, "%s %d %d\n", dates[j], amounts[j], balances[j]); 
-        
-        free(pentry->ptransaction); 
-        pentry->ptransaction = NULL;
-        free(pentry); 
-        pentry = NULL; 
-    
-        
-        j++; 
+        fprintf(p_outputfile, "%s %d %d\n", get_date(entries[j]), get_amount(entries[j]), get_balance(entries[j])); 
       }
       else {
         perror("Failed to parse statement.\n");
       }
-      
-  
     } /* Get next statement */
     
+
+
+    /* Finished all operations on entries by here */
+    for (size_t j = 0; j < number_entries; j++) {
+      if (entries[j]) {
+        free(entries[j]->ptransaction);
+        entries[j]->ptransaction = NULL;
+        free(entries[j]);  
+        entries[j] = NULL; 
+      } 
+    } 
     
-
-    /* Unused statistics, may be valuable in future */     
-
-    int max_amount = INT_MIN, min_amount = INT_MAX;
-    int max_balance = INT_MIN, min_balance = INT_MAX;
-
-    for (size_t i = 0; i < number_entries; i++) {
-      const int amount = amounts[i];
-      max_amount = amount >= max_amount ? amount : max_amount;
-      min_amount = amount <= min_amount ? amount : min_amount;
-      const int balance = balances[i];
-      max_balance = balance >= max_balance ? balance : max_balance; 
-      min_balance = balance <= min_balance ? balance : min_balance; 
-    }
-
   } /* End of file operations */ 
    
   else {
     perror("Failed to open .csv/.dat file\n");
     return -1; 
   }
-  
   
 
   fclose(p_inputfile); 
