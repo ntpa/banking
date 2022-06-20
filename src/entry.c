@@ -135,6 +135,13 @@ struct Entry *create_entry(char *statement) {
 
 }
 
+extern void free_entry(struct Entry *pentry) {
+  free(pentry->ptransaction);
+  pentry->ptransaction = NULL;
+  free(pentry);
+  pentry = NULL; 
+}
+
 extern int get_amount(const struct Entry *pentry) {
   return pentry->ptransaction->amount;
 }

@@ -6,11 +6,11 @@
 
 /* 
  * main() - takes in CSV file which represents Capital One Bank Statements from certain time period
- *          and creates a .dat file for gnuplot usage
+ *          and creates a .out file with reduced fields 
  *  
  * @argc: number of command line arguments
  * @argv: the strings representing command line arguments. Expects a filename that points to a 
- *        Capital One Bank Statement CSV file, and an output file specifier for the .dat file
+ *        Capital One Bank Statement CSV file, and an output file specifier for the new space delimted file 
  * 
  *  Description: 
  *          Given an input file that references a file containing a Capital One Bank Statement
@@ -76,14 +76,11 @@ int main(int argc, char* argv[]) {
     } /* Get next statement */
     
 
-
     /* Finished all operations on entries by here */
-    for (size_t j = 0; j < number_entries; j++) {
+    for (size_t j = 0; j < number_entries; j++) {      
       if (entries[j]) {
-        free(entries[j]->ptransaction);
-        entries[j]->ptransaction = NULL;
-        free(entries[j]);  
-        entries[j] = NULL; 
+
+        free_entry(entries[j]);
       } 
     } 
     

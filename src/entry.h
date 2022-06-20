@@ -38,6 +38,18 @@ struct Entry {
  */
 
 extern struct Entry *create_entry(char *statement);
+/*
+ * free_entry() - deallocate an entry
+ * @pentry: A non-null entry 
+ * 
+ * Description: Free an entry. Assumes that entry is not null, as validated
+ *              prior to function call
+ * 
+ * Return: Nothing
+ * 
+ */ 
+extern void free_entry(struct Entry *pentry); 
+
 
 // simple get functions
 extern int get_amount(const struct Entry *pentry);
