@@ -46,8 +46,9 @@ int main(int argc, char *argv[]) {
   }
 
   std::ifstream ifs(argv[1], std::ifstream::in); 
-  if (!ifs.is_open()) {
-    std::cout << "Failed to open input file. Please check directory permissions\n"; 
+  std::ofstream ofs(argv[2], std::ofstream::out); 
+  if (!ifs.is_open() || !ofs.is_open())  {
+    std::cout << "Failed to open input/output file. Please check directory permissions\n"; 
     return -1; 
   }
 
@@ -60,7 +61,10 @@ int main(int argc, char *argv[]) {
  
   } /* Finished reading file */ 
   
+  
 
+  ofs << sl; 
+  
   std::cout << "Max deposit: " << sl.getMaxDeposit() << " happened on " << sl.getMaxDepositDate() << '\n';
   std::cout << "Max withdrawal: " << sl.getMaxWithdrawal() << " happened on " << sl.getMaxWithdrawalDate() << '\n';
   std::cout << "Max balance: " << sl.getMaxBalance() << " happened on " << sl.getMaxBalanceDate() << '\n';
