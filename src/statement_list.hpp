@@ -72,7 +72,8 @@ public:
       }
       else {
         // TODO: Implement proper exception handling
-        std::cout << "Failed to match regex\n";
+        std::cout << "Failed to match statement below to regex\n";
+        std::cout << statement_string << '\n';
       }
   }
 

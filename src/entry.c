@@ -33,7 +33,7 @@ struct Transaction {
  */
 
 static struct Transaction *create_transaction(int amount, const char *date, const char *type, const char* description) {
-  struct Transaction *pt =  malloc(sizeof(*pt));
+  struct Transaction *pt = (struct Transaction*) malloc(sizeof(*pt));
   if (pt) {
     pt->amount = amount;
     strncpy(pt->date, date, DATE_LENGTH);
@@ -67,7 +67,7 @@ static struct Entry *validate_statement(const char account_num[ACCOUNT_NUM_LENGT
                             ,int amount, const char *date, const char *type
                             , const char *description) {
   
-  struct Entry *pentry = malloc(sizeof(*pentry)); 
+  struct Entry *pentry = (struct Entry*)malloc(sizeof(*pentry)); 
   if (pentry) {
     strncpy(pentry->account_num, account_num, ACCOUNT_NUM_LENGTH);
     pentry->balance = balance;  
@@ -122,7 +122,7 @@ extern void free_entry(struct Entry *pentry) {
   pentry = NULL; 
 }
 
-extern void free_entries(size_t number_entries, struct Entry *pentries[number_entries]) {
+extern void free_entries(size_t number_entries, struct Entry **pentries) {
   for (size_t i = 0; i < number_entries; i++) {
     if (pentries[i]) {
       free_entry(pentries[i]); 

@@ -17,6 +17,10 @@
 
 #define ACCOUNT_NUM_LENGTH 5
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct Transaction; 
 
 struct Entry {
@@ -51,7 +55,7 @@ extern struct Entry *create_entry(char *statement);
  * 
  */ 
 extern void free_entry(struct Entry *pentry); 
-extern void free_entries(size_t number_entries, struct Entry *pentries[number_entries]);
+extern void free_entries(size_t number_entries, struct Entry **pentries);
 
 // simple get functions
 extern int get_amount(const struct Entry *pentry);
@@ -70,4 +74,8 @@ extern char *get_description(const struct Entry *pentry);
  * Return: There is no return value 
  */
 extern void print_entry(const struct Entry *pentry); 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 #endif /* ENTRY_H */
