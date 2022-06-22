@@ -12,13 +12,14 @@
 #include <fstream> 
 // Libraries not in standard
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include "entry.h"
 
 class StatementList {
 
 
   std::map<boost::gregorian::date, std::pair<int, int>> statements;    
-  const unsigned statementLength; 
-  const std::regex regex; 
+  const unsigned statementLength{}; 
+  const std::regex regex{}; 
 
   void addStatement(boost::gregorian::date date, int amount, int balance) {
     auto it = statements.find(date);
@@ -34,10 +35,16 @@ class StatementList {
   }
 
 public: 
+  /*
+   * shallow copy 
+   * c variable naming style to indicate type of data dealing with 
+   * undefined behavior if number entries invalid
+   * DOES NOT MODIFY Struct Entry 
+   */ 
+  StatementList(struct Entry **pentries, size_t number_entries); 
   explicit StatementList(const unsigned statementLength, const std::regex regex)
   : statementLength{ statementLength }
   , regex{ regex } {}
-
   ~StatementList() = default; 
 
   StatementList() = delete; 

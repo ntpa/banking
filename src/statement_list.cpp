@@ -1,5 +1,26 @@
 #include "statement_list.hpp"
 
+StatementList::StatementList(struct Entry **pentries, size_t number_entries) {
+  auto fromUSDateToGregorianDate = [](const std::string date) {
+    std::string undelimited_date = "20"; // assume no date is prior to year 2000
+    undelimited_date.push_back(date[6]); undelimited_date.push_back(date[7]); // year
+    undelimited_date.push_back(date[0]); undelimited_date.push_back(date[1]); // month
+    undelimited_date.push_back(date[3]); undelimited_date.push_back(date[4]); // day
+
+    auto boost_date = boost::gregorian::from_undelimited_string(undelimited_date);
+    return boost_date; 
+  };
+  for (size_t i = 0; i < number_entries; i++) {
+    if (pentries[i] == NULL) {
+      // invalid entry number. Likely incorrect number_entries given 
+      break;
+    }
+    auto date = fromUSDateToGregorianDate(get_date(pentries[i])); 
+    this->addStatement(date, get_amount(pentries[i]), get_balance(pentries[i]));
+  }
+}
+
+
 const std::optional<int> StatementList::getAmount(boost::gregorian::date date) const {
   const auto it = statements.find(date);
   if (it != statements.end()) {

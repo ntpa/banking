@@ -51,19 +51,12 @@
 #define TEMP_STATEMENT_LENGTH 18 
 
 int main(int argc, char *argv[]) {
-
   if (argc != 3) {
     std::cout << "Usage: <executable> <input-file> <output-file>\n"; 
     return -1; 
   }
-
-  /**** START OF C Function Calls ****/ 
-
   FILE *p_inputfile = fopen(argv[1], "r");  
-  const char *temp_filename = "temp.out"; 
-  FILE *p_tmpfile = fopen(temp_filename, "w"); 
-
-  if (p_inputfile == NULL || p_tmpfile == NULL) {
+  if (p_inputfile == NULL) {
     perror("Failed to open .csv file"); 
     return -1; 
   }
@@ -73,45 +66,32 @@ int main(int argc, char *argv[]) {
   while(fgets(csv_statement, CSV_STATEMENT_LENGTH, p_inputfile)) {
     number_entries++;
   }
-  fseek(p_inputfile, 0, SEEK_SET);
 
+  fseek(p_inputfile, 0, SEEK_SET);
   struct Entry *pentries[number_entries];
   for (size_t j = 0; fgets(csv_statement, CSV_STATEMENT_LENGTH, p_inputfile); j++) {
     // dynamic memory returned
     pentries[j] = create_entry(csv_statement);
-    if (pentries[j]) {
-      fprintf(p_tmpfile, "%s %d %d\n", get_date(pentries[j]), get_amount(pentries[j]), get_balance(pentries[j]));
-    }
-    else {
-      perror("Failed to parse csv_statement.\n");
-    }
-  } /* Get next statement */
-
-  /* No more operations on entries past here */
-  free_entries(number_entries, pentries);
-  /* End of file operations */
+  }
 
   fclose(p_inputfile);
-  fclose(p_tmpfile); 
-  /**** END OF C Function Calls ****/ 
+  /* End of input file operations */
 
-  std::ifstream ifs(temp_filename, std::ifstream::in); 
   std::ofstream ofs(argv[2], std::ofstream::out); 
-  if (!ifs.is_open() || !ofs.is_open())  {
-    std::cout << "Failed to open files. Please check directory permissions\n"; 
+  if (!ofs.is_open())  {
+    std::cout << "Failed to open output file. Please check directory permissions\n"; 
     return -1; 
   }
 
-  StatementList sl(TEMP_STATEMENT_LENGTH, std::regex{R"((\S{8}) (-?\d+) (-?\d+))"} );
-  char temp_statement[TEMP_STATEMENT_LENGTH]; 
-  while(ifs.getline(temp_statement, TEMP_STATEMENT_LENGTH)) { /* For every statement */ 
-    sl.addStatement(temp_statement); 
- 
-  } /* Finished reading file */ 
-  
+  // StatementList sl(TEMP_STATEMENT_LENGTH, std::regex{R"((\S{8}) (-?\d+) (-?\d+))"} );
+  StatementList sl(pentries, number_entries);   
+
   ofs << sl; 
   std::cout << "Max deposit: " << sl.getMaxDeposit() << " happened on " << sl.getMaxDepositDate() << '\n';
   std::cout << "Max withdrawal: " << sl.getMaxWithdrawal() << " happened on " << sl.getMaxWithdrawalDate() << '\n';
   std::cout << "Max balance: " << sl.getMaxBalance() << " happened on " << sl.getMaxBalanceDate() << '\n';
   std::cout << "Min balance: " << sl.getMinBalance() << " happened on " << sl.getMinBalanceDate() << '\n';
+
+  /* Implentation defines that entries be freed at end of main (StatementList points to same memory) */
+  free_entries(number_entries, pentries); 
 }
