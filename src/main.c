@@ -62,25 +62,20 @@ int main(int argc, char* argv[]) {
   }
   fseek(p_inputfile, 0, SEEK_SET);
   
-  struct Entry *entries[number_entries]; 
+  struct Entry *pentries[number_entries]; 
   for (size_t j = 0; fgets(statement, STATEMENT_LENGTH, p_inputfile); j++) { 
     // dynamic memory returned 
-    entries[j] = create_entry(statement);
-    if (entries[j]) {
-      fprintf(p_outputfile, "%s %d %d\n", get_date(entries[j]), get_amount(entries[j]), get_balance(entries[j])); 
+    pentries[j] = create_entry(statement);
+    if (pentries[j]) {
+      fprintf(p_outputfile, "%s %d %d\n", get_date(pentries[j]), get_amount(pentries[j]), get_balance(pentries[j])); 
     }
     else {
       perror("Failed to parse statement.\n");
     }
   } /* Get next statement */
 
-  /* Finished all operations on entries by here */
-  for (size_t j = 0; j < number_entries; j++) {      
-    if (entries[j]) {
-      free_entry(entries[j]);
-    } 
-  } 
-
+  /* No more operations on entries past here */
+  free_entries(number_entries, pentries);
   /* End of file operations */ 
    
   fclose(p_inputfile); 

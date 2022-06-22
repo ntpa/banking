@@ -122,6 +122,16 @@ extern void free_entry(struct Entry *pentry) {
   pentry = NULL; 
 }
 
+extern void free_entries(size_t number_entries, struct Entry *pentries[number_entries]) {
+  for (size_t i = 0; i < number_entries; i++) {
+    if (pentries[i]) {
+      free_entry(pentries[i]); 
+    }
+  }
+  pentries = NULL; 
+
+} 
+
 extern int get_amount(const struct Entry *pentry) {
   return pentry->ptransaction->amount;
 }

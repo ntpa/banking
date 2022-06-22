@@ -13,6 +13,8 @@
 #ifndef ENTRY_H
 #define ENTRY_H
 
+#include <stddef.h>
+
 #define ACCOUNT_NUM_LENGTH 5
 
 struct Transaction; 
@@ -49,7 +51,7 @@ extern struct Entry *create_entry(char *statement);
  * 
  */ 
 extern void free_entry(struct Entry *pentry); 
-
+extern void free_entries(size_t number_entries, struct Entry *pentries[number_entries]);
 
 // simple get functions
 extern int get_amount(const struct Entry *pentry);
