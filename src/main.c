@@ -49,49 +49,40 @@ int main(int argc, char* argv[]) {
   } 
   FILE *p_inputfile = fopen(argv[1], "r");
   FILE *p_outputfile = fopen(argv[2], "w"); 
-  if (p_inputfile != NULL && p_outputfile != NULL) {
-
-    char statement[STATEMENT_LENGTH];    
-    
-    size_t number_entries = 0; 
-    while(fgets(statement, STATEMENT_LENGTH, p_inputfile)) {
-      number_entries++;
-    }
-    
-
-    fseek(p_inputfile, 0, SEEK_SET);    
-    // allocate entries array
-    struct Entry *entries[number_entries]; 
-
-    for (size_t j = 0; fgets(statement, STATEMENT_LENGTH, p_inputfile); j++) { 
-      // dynamic memory returned
-      entries[j] = create_entry(statement);
-      if (entries[j]) {
-         /* Process Entry */   
-        fprintf(p_outputfile, "%s %d %d\n", get_date(entries[j]), get_amount(entries[j]), get_balance(entries[j])); 
-      }
-      else {
-        perror("Failed to parse statement.\n");
-      }
-    } /* Get next statement */
-    
-
-    /* Finished all operations on entries by here */
-    for (size_t j = 0; j < number_entries; j++) {      
-      if (entries[j]) {
-
-        free_entry(entries[j]);
-      } 
-    } 
-    
-  } /* End of file operations */ 
-   
-  else {
-    perror("Failed to open .csv/.dat file\n");
+  if (p_inputfile == NULL || p_outputfile == NULL) {
+    perror("Failed to open files\n");
     return -1; 
-  }
-  
+  }  
 
+
+  char statement[STATEMENT_LENGTH];    
+  size_t number_entries = 0; 
+  while(fgets(statement, STATEMENT_LENGTH, p_inputfile)) {
+    number_entries++;
+  }
+  fseek(p_inputfile, 0, SEEK_SET);
+  
+  struct Entry *entries[number_entries]; 
+  for (size_t j = 0; fgets(statement, STATEMENT_LENGTH, p_inputfile); j++) { 
+    // dynamic memory returned 
+    entries[j] = create_entry(statement);
+    if (entries[j]) {
+      fprintf(p_outputfile, "%s %d %d\n", get_date(entries[j]), get_amount(entries[j]), get_balance(entries[j])); 
+    }
+    else {
+      perror("Failed to parse statement.\n");
+    }
+  } /* Get next statement */
+
+  /* Finished all operations on entries by here */
+  for (size_t j = 0; j < number_entries; j++) {      
+    if (entries[j]) {
+      free_entry(entries[j]);
+    } 
+  } 
+
+  /* End of file operations */ 
+   
   fclose(p_inputfile); 
   fclose(p_outputfile); 
   return 0; 

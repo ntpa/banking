@@ -33,7 +33,6 @@ struct Transaction {
  */
 
 static struct Transaction *create_transaction(int amount, const char *date, const char *type, const char* description) {
-
   struct Transaction *pt =  malloc(sizeof(*pt));
   if (pt) {
     pt->amount = amount;
@@ -41,7 +40,6 @@ static struct Transaction *create_transaction(int amount, const char *date, cons
     strncpy(pt->type, type, TYPE_LENGTH);
     strncpy(pt->description, description, DESCRIPTION_LENGTH); 
   }
-
   return pt; 
 }
 
@@ -73,9 +71,7 @@ static struct Entry *validate_statement(const char account_num[ACCOUNT_NUM_LENGT
   if (pentry) {
     strncpy(pentry->account_num, account_num, ACCOUNT_NUM_LENGTH);
     pentry->balance = balance;  
-    
     pentry->ptransaction = create_transaction(amount, date, type, description); 
-
     if (pentry->ptransaction) {
       return pentry; 
     }
@@ -91,22 +87,8 @@ static struct Entry *validate_statement(const char account_num[ACCOUNT_NUM_LENGT
     free(pentry);
     pentry = NULL; 
     return NULL;
-
 }
 
-
-/*
- * create_entry() - create an entry.
- * @statment: A string pointing to a bank statement in the form 
- *              "Account Number,Transaction Date,Transaction Amount,Transaction Type,Transaction Description,Balance"
- *            includes new-line character (as well as null terminator) at the end of string
- * Description:
- *            Dynamically allocate an Entry object given a bank statement . Assume input parameter
- *            valid. If successful, return the created object,
- *            otherwise return NULL value.
- *
- * Return: pointer to dynamically allocated Entry
- */
 
 struct Entry *create_entry(char *statement) {
   // safe to modify statement through strtok
@@ -116,7 +98,6 @@ struct Entry *create_entry(char *statement) {
   const char* type = strtok(NULL, ",");
   const char* description = strtok(NULL, ",");
   int balance = atoi(strtok(NULL, "\n"));
-
   
   if (account_num && date && type && description) {
     struct Entry *pentry = validate_statement(account_num, balance, amount, date, type, description);
@@ -132,7 +113,6 @@ struct Entry *create_entry(char *statement) {
   }
   
   return NULL;
-
 }
 
 extern void free_entry(struct Entry *pentry) {
@@ -160,11 +140,8 @@ extern char *get_description(const struct Entry *pentry) {
 
 
 void print_entry(const struct Entry *pentry) {
-
  printf("%s,%s,%d,%s,%s,%.d\n",
             pentry->account_num, pentry->ptransaction->date
             ,pentry->ptransaction->amount, pentry->ptransaction->type
             , pentry->ptransaction->description, pentry->balance);
-
-  
 }
