@@ -23,10 +23,14 @@ void StatementList::addStatement(const Statement& statement) {
                                 , (it->second).getDate()); 
         list[gregorian_date] = temp_statement;
     }
-    else {
+    else { /* New Date */ 
+      start_date = gregorian_date < start_date ? gregorian_date : start_date; 
+      end_date = gregorian_date > end_date ? gregorian_date : end_date;     
+  
       // operator[] chosen over insert() and emplace() methods due to 
-      // std::pair template operation 
+      // std::pair bug in template conversion 
       list[gregorian_date] = statement;
+      
     }
 }
  
@@ -103,7 +107,7 @@ int StatementList::getMinBalance() const {
   return min;
 }
 
-std::string StatementList::getMaxDepositDate() const {
+boost::gregorian::date StatementList::getMaxDepositDate() const {
   int max = std::numeric_limits<int>::min();
   boost::gregorian::date date{};
   for (const auto& it: list) {
@@ -111,10 +115,10 @@ std::string StatementList::getMaxDepositDate() const {
     max = amount > max ? amount : max;
     date = max == amount ? it.first : date;
   }
-  return to_iso_extended_string(date);
+  return date;
 }
 
-std::string StatementList::getMaxWithdrawalDate() const {
+boost::gregorian::date StatementList::getMaxWithdrawalDate() const {
   int min = std::numeric_limits<int>::max();
   boost::gregorian::date date{};
   for (const auto& it: list) {
@@ -122,10 +126,10 @@ std::string StatementList::getMaxWithdrawalDate() const {
     min = amount < min ? amount : min;
     date = min == amount ? it.first : date;
   }
-  return to_iso_extended_string(date);
+  return date;
 }
 
-std::string StatementList::getMaxBalanceDate() const {
+boost::gregorian::date StatementList::getMaxBalanceDate() const {
   int max = std::numeric_limits<int>::min();
   boost::gregorian::date date{};
   for (const auto& it : list) {
@@ -133,10 +137,10 @@ std::string StatementList::getMaxBalanceDate() const {
     max = balance > max ? balance : max;
     date = max == balance ? it.first : date;
   }
-  return to_iso_extended_string(date);
+  return date;
 }
 
-std::string StatementList::getMinBalanceDate() const {
+boost::gregorian::date StatementList::getMinBalanceDate() const {
   int min = std::numeric_limits<int>::max();
   boost::gregorian::date date{};
   for (const auto& it : list) {
@@ -144,15 +148,50 @@ std::string StatementList::getMinBalanceDate() const {
     min = balance < min ? balance : min;
     date = min == balance ? it.first : date;
   }
-  return to_iso_extended_string(date);
+  return date;
 }
 
 
+boost::gregorian::date StatementList::getStartDate() const { return start_date; }
+boost::gregorian::date StatementList::getEndDate() const { return end_date; }
+
+
+const StatementList StatementList::getStatementRange(boost::gregorian::date start, boost::gregorian::date end) const {
+  // TODO: Handle incorrect date format given 
+  // gracefully handle incorrect statement date range
+  StatementList result; 
+  if (start > end) {
+    perror("Please make sure start date is prior to end date\n"); 
+    return result;
+  }
+
+  start = start < start_date ? start_date : start;
+  end = end > end_date ? end_date : end; 
+
+  // safe to assume argument date is within range (start_date, end_date)
+  auto findClosestStartDate = [this](boost::gregorian::date date) {
+    return list.lower_bound(date); 
+    
+  };
+  // functions seperate to allow end to be inclusive 
+  auto findClosestEndDate =  [this](boost::gregorian::date date) {
+    return list.upper_bound(date); 
+  };
+  // Bi-directional iterators
+  auto it_start = findClosestStartDate(start);
+  const auto it_end = findClosestEndDate(end); 
+
+  for (; it_start != it_end; it_start++) {
+    const Statement temp = it_start->second; 
+    result.addStatement(temp); 
+  }  
+
+  return result;
+}
+
 void StatementList::printList() const {
-  size_t x{0};
   for (const auto& it : list) {
-    // TODO: make 'x' the date period between statements
-    std::cout << x++ << ' ' <<  (it.second).getAmount()
+    std::cout << it.first << ' ' <<  (it.second).getAmount()
     << ' ' << (it.second).getBalance() << '\n';
   }
 }

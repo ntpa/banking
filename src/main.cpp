@@ -86,10 +86,18 @@ int main(int argc, char *argv[]) {
   StatementList sl(pentries, number_entries);   
 
   ofs << sl; 
+  std::cout << "Statements from " << sl.getStartDate() << " - " << sl.getEndDate() << '\n'; 
   std::cout << "Max deposit: " << sl.getMaxDeposit() << " happened on " << sl.getMaxDepositDate() << '\n';
   std::cout << "Max withdrawal: " << sl.getMaxWithdrawal() << " happened on " << sl.getMaxWithdrawalDate() << '\n';
   std::cout << "Max balance: " << sl.getMaxBalance() << " happened on " << sl.getMaxBalanceDate() << '\n';
   std::cout << "Min balance: " << sl.getMinBalance() << " happened on " << sl.getMinBalanceDate() << '\n';
+
+  boost::gregorian::date start_date(boost::gregorian::from_string("2021/02/10")); 
+  boost::gregorian::date end_date(boost::gregorian::from_string("2022/7/12")); 
+  
+  auto statementRange = sl.getStatementRange(start_date, end_date); 
+  
+  statementRange.printList(); 
 
   /* Implentation defines that entries be freed at end of main (StatementList points to same memory) */
   free_entries(number_entries, pentries); 

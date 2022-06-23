@@ -12,6 +12,7 @@
 #include <fstream> 
 // Libraries not in standard
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/special_defs.hpp>
 #include "entry.h"
 
 class Statement {
@@ -26,9 +27,8 @@ public:
   ~Statement() = default; 
   Statement() = default;
   Statement& operator=(const Statement& other) = default; 
-  
-    
-  Statement(const Statement& sl) = delete;
+  Statement(const Statement& sl) = default;
+
   Statement(Statement&& sl) = delete;
   Statement& operator=(Statement&& other) = delete;
 
@@ -42,6 +42,8 @@ public:
 
 class StatementList {
   std::map<boost::gregorian::date, Statement> list;    
+  boost::gregorian::date start_date{boost::date_time::special_values::max_date_time};
+  boost::gregorian::date end_date{boost::date_time::special_values::min_date_time}; 
 public: 
   /*
    * shallow copy 
@@ -52,8 +54,9 @@ public:
   StatementList(struct Entry **pentries, size_t number_entries); 
   StatementList(const std::vector<Statement>& statements);
   
-  StatementList() = delete; 
-  StatementList(const StatementList& sl) = delete;
+  StatementList() = default; 
+  StatementList(const StatementList& sl) = default;
+
   StatementList(StatementList&& sl) = delete; 
   StatementList& operator=(const StatementList& other) = delete; 
   StatementList& operator=(StatementList&& other) = delete; 
@@ -68,11 +71,18 @@ public:
   int getMaxBalance() const;
   int getMinBalance() const;
 
-  std::string getMaxDepositDate() const;
-  std::string getMaxWithdrawalDate() const;
-  std::string getMaxBalanceDate() const;
-  std::string getMinBalanceDate() const;
-  
+  boost::gregorian::date getMaxDepositDate() const;
+  boost::gregorian::date getMaxWithdrawalDate() const;
+  boost::gregorian::date getMaxBalanceDate() const;
+  boost::gregorian::date getMinBalanceDate() const;
+ 
+
+  boost::gregorian::date getStartDate() const;
+  boost::gregorian::date getEndDate() const; 
+ 
+  // (start,end] is an inclusive range
+  const StatementList getStatementRange(boost::gregorian::date start, boost::gregorian::date end) const; 
+
   void printList() const;
   friend std::ostream& operator<<(std::ostream& os, const StatementList& sl) {
     os << "#Date Amount Balance\n"; 
