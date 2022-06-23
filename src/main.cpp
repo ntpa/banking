@@ -83,7 +83,6 @@ int main(int argc, char *argv[]) {
     return -1; 
   }
 
-  // StatementList sl(TEMP_STATEMENT_LENGTH, std::regex{R"((\S{8}) (-?\d+) (-?\d+))"} );
   StatementList sl(pentries, number_entries);   
 
   ofs << sl; 
