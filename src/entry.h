@@ -32,9 +32,12 @@ struct Entry {
 
 /*
  * create_entry() - create an entry.
- * @statment: A string pointing to a bank statement in the form
+ * @statment: 
+ *            A string pointing to a bank statement in the form
  *              "Account Number,Transaction Date,Transaction Amount,Transaction Type,Transaction Description,Balance"
- *            includes new-line character (as well as null terminator) at the end of string
+ *            includes new-line character (as well as null terminator) at the end of string. 
+ *
+ *            The statements are passed in from most recent to least recent
  * Description:
  *            Dynamically allocate an Entry object given a bank statement . Assume input parameter
  *            valid. If successful, return the created object,

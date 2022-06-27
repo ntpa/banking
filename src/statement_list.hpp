@@ -10,6 +10,7 @@
 #include <limits>
 #include <regex>
 #include <fstream> 
+#include <cstdlib>
 // Libraries not in standard
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/special_defs.hpp>
@@ -63,22 +64,32 @@ public:
   
   void addStatement(const Statement& statement); 
 
+  
+  // returns lower bound to given date
+  // if given date is before statementlist range then return the 1st recorded statement
+  // if given date is after statementlist range then return the last recorded statement
+  Statement& operator[](boost::gregorian::date date);
+
   const std::optional<int> getAmount(boost::gregorian::date date) const;
   const std::optional<int> getBalance(boost::gregorian::date date) const; 
 
   int getMaxDeposit() const;
-  int getMaxWithdrawal() const;
-  int getMaxBalance() const;
-  int getMinBalance() const;
-
   boost::gregorian::date getMaxDepositDate() const;
+
+  int getMaxWithdrawal() const;
   boost::gregorian::date getMaxWithdrawalDate() const;
+
+  int getMaxBalance() const;
   boost::gregorian::date getMaxBalanceDate() const;
+
+  int getMinBalance() const;
   boost::gregorian::date getMinBalanceDate() const;
  
 
   boost::gregorian::date getStartDate() const;
   boost::gregorian::date getEndDate() const; 
+  
+  int size() const { return list.size(); }
  
   // (start,end] is an inclusive range
   const StatementList getStatementRange(boost::gregorian::date start, boost::gregorian::date end) const; 

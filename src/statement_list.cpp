@@ -197,3 +197,15 @@ void StatementList::printList() const {
 }
 
 
+Statement& StatementList::operator[](boost::gregorian::date date) {
+  if (date < start_date) {
+    return list[start_date]; 
+  }
+  else if (date > end_date) {
+    return list[end_date];
+  }
+  else {
+    return (list.lower_bound(date))->second;
+  }
+}
+
