@@ -53,8 +53,7 @@ StatementList::StatementList(const std::vector<Statement>& statements) {
 
 }
 
-
-const std::optional<int> StatementList::getAmount(boost::gregorian::date date) const {
+std::optional<int> StatementList::getAmount(boost::gregorian::date date) const {
   const auto it = list.find(date);
   if (it != list.end()) {
     return (it->second).getAmount();
@@ -62,7 +61,7 @@ const std::optional<int> StatementList::getAmount(boost::gregorian::date date) c
   return std::nullopt;
 }
 
-const std::optional<int> StatementList::getBalance(boost::gregorian::date date) const {
+std::optional<int> StatementList::getBalance(boost::gregorian::date date) const {
   const auto it = list.find(date);
   if (it != list.end()) {
     return (it->second).getBalance(); 
@@ -156,7 +155,7 @@ boost::gregorian::date StatementList::getStartDate() const { return start_date; 
 boost::gregorian::date StatementList::getEndDate() const { return end_date; }
 
 
-const StatementList StatementList::getStatementRange(boost::gregorian::date start, boost::gregorian::date end) const {
+StatementList StatementList::getDateRange(boost::gregorian::date start, boost::gregorian::date end) const {
   // TODO: Handle incorrect date format given 
   // gracefully handle incorrect statement date range
   StatementList result; 
@@ -189,6 +188,31 @@ const StatementList StatementList::getStatementRange(boost::gregorian::date star
   return result;
 }
 
+StatementList StatementList::getAmountRange(int min, int max) const {
+  StatementList result; 
+  for (const auto& entry : list) {
+    const auto statement = entry.second; 
+    const auto amount = statement.getAmount(); 
+    if (amount >= min && amount <= max) {
+      result.addStatement(statement); 
+    }
+  }
+  return result;
+}
+
+StatementList StatementList::getBalanceRange(int min, int max) const {
+  StatementList result;
+  for (const auto& entry : list) {
+    const auto statement = entry.second; 
+    const auto balance = statement.getBalance(); 
+    if (balance >= min && balance <= max) {
+      result.addStatement(statement);
+    }
+  }
+  return result;
+}
+
+
 void StatementList::printList() const {
   for (const auto& it : list) {
     std::cout << it.first << ' ' <<  (it.second).getAmount()
@@ -198,14 +222,48 @@ void StatementList::printList() const {
 
 
 Statement& StatementList::operator[](boost::gregorian::date date) {
-  if (date < start_date) {
-    return list[start_date]; 
-  }
-  else if (date > end_date) {
-    return list[end_date];
-  }
-  else {
-    return (list.lower_bound(date))->second;
-  }
+  date = date < start_date ? start_date : date; 
+  date = date > end_date ? end_date : date; 
+
+  return (list.lower_bound(date))->second;
 }
 
+
+std::ostream& operator<<(std::ostream& os, const StatementList& sl) {
+  os << "#Date Amount Balance\n"; 
+  for (const auto& entry : sl.list) {
+    os << entry.first << ' ' << (entry.second).getAmount() << ' '
+    << (entry.second).getBalance() << '\n'; 
+  }
+  return os; 
+}
+
+
+int StatementList::getNumStatements() const {
+  return list.size(); 
+}
+
+int StatementList::getNumDeposits() const {
+  int numDeposits{0}; 
+  for (const auto& entry : list) {
+    const auto statement = entry.second; 
+    // Include ZERO because implies that
+    // a deposit occured on this date since amount is sum of all
+    // statements on that date
+    if (statement.getAmount() >= 0) {
+      numDeposits++; 
+    }
+  }
+  return numDeposits; 
+}
+
+int StatementList::getNumWithdrawals() const {
+  int numWithdrawals{0}; 
+  for (const auto& entry : list) {
+    const auto statement = entry.second; 
+    if (statement.getAmount() < 0) {
+      numWithdrawals++; 
+    }
+  }
+  return numWithdrawals; 
+}

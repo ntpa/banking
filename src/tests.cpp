@@ -82,3 +82,86 @@ TEST_CASE("StatementList Constructors", "[StatementList]") {
   free_entries(number_entries, pentries); 
 }
 
+
+TEST_CASE("Assignment and Copy operations", "[StatementList]") {
+  const size_t number_entries = 3; 
+  struct Entry *pentries[number_entries];
+  char statement[STATEMENT_LENGTH] = "0546,09/20/2020,50,Debit,Fake transaction 1, 320";
+  pentries[0] = create_entry(statement);
+  char statement2[STATEMENT_LENGTH] = "0546,05/10/2020,-30,Debit,Fake transaction 1, 270";
+  pentries[1] = create_entry(statement2);
+  char statement3[STATEMENT_LENGTH] = "0546,05/10/2020,-100,Debit,Fake transaction 1, 300"; 
+  pentries[2] = create_entry(statement3);
+
+  std::vector<Statement> statements; 
+  Statement s(get_amount(pentries[0]), get_balance(pentries[0]), get_date(pentries[0])); 
+  Statement s2(get_amount(pentries[1]), get_balance(pentries[1]), get_date(pentries[1]));
+  Statement s3(get_amount(pentries[2]), get_balance(pentries[2]), get_date(pentries[2])); 
+  statements.push_back(s); statements.push_back(s2); statements.push_back(s3); 
+  StatementList sl(statements);  
+
+  SECTION("Assignment operator") {
+    StatementList sl2 = sl;
+    REQUIRE(sl2.getMaxDeposit() == sl.getMaxDeposit()); 
+    REQUIRE(sl2.getMaxWithdrawal() == sl.getMaxWithdrawal()); 
+    REQUIRE(sl2.getMaxBalance() == sl.getMaxBalance());
+    REQUIRE(sl2.getMinBalance() == sl.getMinBalance()); 
+    
+    REQUIRE(sl2.getMaxDepositDate() == sl.getMaxDepositDate());
+    REQUIRE(sl2.getMaxWithdrawalDate() == sl.getMaxWithdrawalDate());
+    REQUIRE(sl2.getMaxBalanceDate() == sl.getMaxBalanceDate());
+    REQUIRE(sl2.getMinBalanceDate() == sl.getMinBalanceDate()); 
+    REQUIRE(sl2.getStartDate() == sl.getStartDate());
+    REQUIRE(sl2.getEndDate() == sl.getEndDate()); 
+  }
+  SECTION("Copy operation") {
+    StatementList sl2(sl); 
+    REQUIRE(sl2.getMaxDeposit() == sl.getMaxDeposit()); 
+    REQUIRE(sl2.getMaxWithdrawal() == sl.getMaxWithdrawal()); 
+    REQUIRE(sl2.getMaxBalance() == sl.getMaxBalance());
+    REQUIRE(sl2.getMinBalance() == sl.getMinBalance()); 
+    
+    REQUIRE(sl2.getMaxDepositDate() == sl.getMaxDepositDate());
+    REQUIRE(sl2.getMaxWithdrawalDate() == sl.getMaxWithdrawalDate());
+    REQUIRE(sl2.getMaxBalanceDate() == sl.getMaxBalanceDate());
+    REQUIRE(sl2.getMinBalanceDate() == sl.getMinBalanceDate()); 
+    REQUIRE(sl2.getStartDate() == sl.getStartDate());
+    REQUIRE(sl2.getEndDate() == sl.getEndDate()); 
+  }
+
+}
+
+TEST_CASE("operator[]", "[StatementList]") {
+  const size_t number_entries = 3; 
+  struct Entry *pentries[number_entries];
+  char statement[STATEMENT_LENGTH] = "0546,09/20/2020,50,Debit,Fake transaction 1, 320";
+  pentries[0] = create_entry(statement);
+  char statement2[STATEMENT_LENGTH] = "0546,05/10/2020,-30,Debit,Fake transaction 1, 270";
+  pentries[1] = create_entry(statement2);
+  char statement3[STATEMENT_LENGTH] = "0546,05/10/2020,-100,Debit,Fake transaction 1, 300"; 
+  pentries[2] = create_entry(statement3);
+
+  std::vector<Statement> statements; 
+  Statement s(get_amount(pentries[0]), get_balance(pentries[0]), get_date(pentries[0])); 
+  Statement s2(get_amount(pentries[1]), get_balance(pentries[1]), get_date(pentries[1]));
+  Statement s3(get_amount(pentries[2]), get_balance(pentries[2]), get_date(pentries[2])); 
+  statements.push_back(s); statements.push_back(s2); statements.push_back(s3); 
+  StatementList sl(statements);  
+
+  
+  date validDate1(boost::gregorian::from_string("2020-May-10")); 
+  date validDate2(boost::gregorian::from_string("2020-Sep-20")); 
+  REQUIRE(sl[validDate1].getAmount() == -130);
+  REQUIRE(sl[validDate1].getBalance() == 270); 
+  REQUIRE(sl[validDate2].getAmount() == 50);
+  REQUIRE(sl[validDate2].getBalance() == 320); 
+
+  date beforeStartDate(boost::gregorian::from_string("2020-Jan-23")); 
+  date afterEndDate(boost::gregorian::from_string("2024-Aug-10")); 
+
+  REQUIRE(sl[beforeStartDate].getAmount() == -130);
+  REQUIRE(sl[beforeStartDate].getBalance() == 270); 
+  REQUIRE(sl[afterEndDate].getAmount() == 50); 
+  REQUIRE(sl[afterEndDate].getBalance() == 320); 
+
+}
