@@ -96,6 +96,4 @@ public:
   void printList() const;
 }; 
 
-
-
 #endif /* STATEMENT_LIST_HPP */
