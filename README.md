@@ -12,7 +12,7 @@ Assuming all files in src/ in the same directory compile and build executable in
 g++ -Wall -Wextra entry.c statement_list.cpp main.cpp -o bankingcpp
 ```
 
-Please stay tuned.
+Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach out. 
 
 *This application is not endorsed by Capital One*
 
