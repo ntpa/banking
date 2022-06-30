@@ -1,5 +1,6 @@
 #include "statement_list.hpp"
 #include "entry.h"
+#include "parser.hpp"
 
 // Author: Nathan Tadesse
 // Date: 06-19-22
@@ -42,45 +43,29 @@
  * with the MACRO value below.
  *
  */
-#define CSV_STATEMENT_LENGTH 130
-#define TEMP_STATEMENT_LENGTH 18 
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
     perror("Usage: <executable> <input-file> <output-file>\n"); 
     return -1; 
   }
-  FILE *p_inputfile = fopen(argv[1], "r");  
-  if (p_inputfile == NULL) {
-    perror("Failed to open .csv file"); 
-    return -1; 
-  }
-
-  char csv_statement[CSV_STATEMENT_LENGTH];
-  struct Entry *pentry;
-  StatementList statementList; 
-  for (size_t j = 0; fgets(csv_statement, CSV_STATEMENT_LENGTH, p_inputfile); j++) {
-    // dynamic memory returned
-    pentry = create_entry(csv_statement);
-    if (pentry) {
-      const Statement statement(get_amount(pentry), get_balance(pentry), get_date(pentry)); 
-      statementList.addStatement(statement); 
-      free_entry(pentry); 
-    }
-    else {
-      perror("Failed to parse statement"); 
-    }
-  }
-
-  fclose(p_inputfile);
-  /* End of input file operations */
-
+ 
+  std::ifstream ifs(argv[1], std::ifstream::in);
   std::ofstream ofs(argv[2], std::ofstream::out); 
-  if (!ofs.is_open())  {
-    perror("Failed to open output file. Please check directory permissions\n");
-    return -1; 
+  if (!ifs.is_open() || !ofs.is_open()) {
+    perror("Failed to open input or output file\n"); 
+    return -1;
   }
 
+  aria::csv::CsvParser parser(ifs);
+  StatementList statementList;
+  enum Field { date = 1, amount = 2, balance = 5 };
+  for (auto& row : parser) {
+    const Statement statement(std::stoi(row.at(Field::amount))
+                             , std::stoi(row.at(Field::balance))
+                             , row.at(Field::date));
+    statementList.addStatement(statement); 
+  } /* Read all rows in CSV file */ 
   
   ofs << "======  " << statementList.getStartDate() << " - " << statementList.getEndDate() << " ======" << '\n';
   ofs << "Number of statements: " << statementList.getNumStatements() << '\n'; 
@@ -91,5 +76,7 @@ int main(int argc, char *argv[]) {
   ofs << "Min balance: " << statementList.getMinBalance() << " happened on " << statementList.getMinBalanceDate() << '\n';
   ofs << "===================================================" << '\n';  
   ofs << statementList;
+
+  ifs.close(); 
   ofs.close(); 
 }
