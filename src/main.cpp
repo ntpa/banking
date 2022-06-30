@@ -47,7 +47,7 @@
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
-    std::cout << "Usage: <executable> <input-file> <output-file>\n"; 
+    perror("Usage: <executable> <input-file> <output-file>\n"); 
     return -1; 
   }
   FILE *p_inputfile = fopen(argv[1], "r");  
@@ -57,16 +57,19 @@ int main(int argc, char *argv[]) {
   }
 
   char csv_statement[CSV_STATEMENT_LENGTH];
-  size_t number_entries = 0;
-  while(fgets(csv_statement, CSV_STATEMENT_LENGTH, p_inputfile)) {
-    number_entries++;
-  }
-
-  fseek(p_inputfile, 0, SEEK_SET);
-  struct Entry *pentries[number_entries];
+  struct Entry *pentry;
+  StatementList statementList; 
   for (size_t j = 0; fgets(csv_statement, CSV_STATEMENT_LENGTH, p_inputfile); j++) {
     // dynamic memory returned
-    pentries[j] = create_entry(csv_statement);
+    pentry = create_entry(csv_statement);
+    if (pentry) {
+      const Statement statement(get_amount(pentry), get_balance(pentry), get_date(pentry)); 
+      statementList.addStatement(statement); 
+      free_entry(pentry); 
+    }
+    else {
+      perror("Failed to parse statement"); 
+    }
   }
 
   fclose(p_inputfile);
@@ -74,21 +77,19 @@ int main(int argc, char *argv[]) {
 
   std::ofstream ofs(argv[2], std::ofstream::out); 
   if (!ofs.is_open())  {
-    std::cout << "Failed to open output file. Please check directory permissions\n"; 
+    perror("Failed to open output file. Please check directory permissions\n");
     return -1; 
   }
 
-  StatementList sl(pentries, number_entries);   
-
-  ofs << sl; 
-  std::cout << " ====== Statements from " << sl.getStartDate() << " - " << sl.getEndDate() << " ======" << '\n';
-  std::cout << "Number of statements: " << sl.getNumStatements() << '\n'; 
-  std::cout << "Number of deposits: " << sl.getNumDeposits() << "  Number of withdrawals: " << sl.getNumWithdrawals() << '\n'; 
-  std::cout << "Max deposit: " << sl.getMaxDeposit() << " happened on " << sl.getMaxDepositDate() << '\n';
-  std::cout << "Max withdrawal: " << sl.getMaxWithdrawal() << " happened on " << sl.getMaxWithdrawalDate() << '\n';
-  std::cout << "Max balance: " << sl.getMaxBalance() << " happened on " << sl.getMaxBalanceDate() << '\n';
-  std::cout << "Min balance: " << sl.getMinBalance() << " happened on " << sl.getMinBalanceDate() << '\n';
-  std::cout << "===================================================" << '\n';  
-  /* Implentation defines that entries be freed at end of main (StatementList points to same memory) */
-  free_entries(number_entries, pentries); 
+  
+  ofs << "======  " << statementList.getStartDate() << " - " << statementList.getEndDate() << " ======" << '\n';
+  ofs << "Number of statements: " << statementList.getNumStatements() << '\n'; 
+  ofs << "Number of deposits: " << statementList.getNumDeposits() << "  Number of withdrawals: " << statementList.getNumWithdrawals() << '\n'; 
+  ofs << "Max deposit: " << statementList.getMaxDeposit() << " happened on " << statementList.getMaxDepositDate() << '\n';
+  ofs << "Max withdrawal: " << statementList.getMaxWithdrawal() << " happened on " << statementList.getMaxWithdrawalDate() << '\n';
+  ofs << "Max balance: " << statementList.getMaxBalance() << " happened on " << statementList.getMaxBalanceDate() << '\n';
+  ofs << "Min balance: " << statementList.getMinBalance() << " happened on " << statementList.getMinBalanceDate() << '\n';
+  ofs << "===================================================" << '\n';  
+  ofs << statementList;
+  ofs.close(); 
 }

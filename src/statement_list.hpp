@@ -51,6 +51,7 @@ public:
   StatementList(struct Entry **pentries, size_t number_entries); 
   StatementList(const std::vector<Statement>& statements); 
   StatementList() = default; 
+  ~StatementList() = default; 
   StatementList(const StatementList& sl) = default;
   StatementList(StatementList&& sl) = delete; 
   StatementList& operator=(const StatementList& other) = delete; 
