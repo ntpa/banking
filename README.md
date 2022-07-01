@@ -2,9 +2,7 @@
 
 **Capital One bank statements (.csv) analyzer.**
 
-README is under construction. Currently, the C executable is used to generate an output file, which is used by the C++ executable as input.
-
-Please remove the header from the .csv file. 
+Please remove the header from your .csv file. 
 
 Assuming all files in src/ in the same directory compile and build executable in Linux(**Debian**) with:
 
@@ -12,7 +10,15 @@ Assuming all files in src/ in the same directory compile and build executable in
 g++ -Wall -Wextra entry.c statement_list.cpp main.cpp -o bankingcpp
 ```
 
+Run the application: 
+
+```
+./bankingcpp <csv_file_path> <output_file_path> 
+```
+
+
 Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach out. 
 
-*This application is not endorsed by Capital One*
+
+***This application is not endorsed by Capital One***
 
