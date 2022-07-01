@@ -21,7 +21,7 @@ class Statement {
   int balance{};  
   std::string date; 
 public: 
-  Statement(int amount, int balance, std::string date)
+  Statement(int amount, int balance, const std::string& date)
   : amount{ amount }, balance { balance }
   , date{ date } {}
   ~Statement() = default; 
@@ -48,8 +48,8 @@ public:
    * undefined behavior if number entries invalid
    * DOES NOT MODIFY Struct Entry 
    */ 
-  StatementList(struct Entry **pentries, size_t number_entries); 
-  StatementList(const std::vector<Statement>& statements); 
+  explicit StatementList(struct Entry **pentries, size_t number_entries); 
+  explicit StatementList(const std::vector<Statement>& statements); 
   StatementList() = default; 
   ~StatementList() = default; 
   StatementList(const StatementList& sl) = default;
