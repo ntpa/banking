@@ -45,7 +45,7 @@ TEST_CASE("StatementList Constructors", "[StatementList]") {
 
   }
   SECTION("Construct from entries") {
-    StatementList statementList(pentries, number_entries); 
+    StatementList statementList((const struct Entry**)pentries, number_entries); 
     REQUIRE(statementList.getNumStatements() == number_entries-1); 
     REQUIRE(statementList.getMaxDeposit() == 50); 
     REQUIRE(statementList.getMaxWithdrawal() == -130); 

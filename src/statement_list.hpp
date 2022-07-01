@@ -42,13 +42,7 @@ class StatementList {
   boost::gregorian::date start_date{boost::date_time::special_values::max_date_time};
   boost::gregorian::date end_date{boost::date_time::special_values::min_date_time}; 
 public: 
-  /*
-   * shallow copy 
-   * c variable naming style to indicate type of data dealing with 
-   * undefined behavior if number entries invalid
-   * DOES NOT MODIFY Struct Entry 
-   */ 
-  explicit StatementList(struct Entry **pentries, size_t number_entries); 
+  explicit StatementList(const struct Entry **pentries, size_t number_entries); 
   explicit StatementList(const std::vector<Statement>& statements); 
   StatementList() = default; 
   ~StatementList() = default; 

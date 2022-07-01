@@ -34,7 +34,7 @@ void StatementList::addStatement(const Statement& statement) {
     }
 }
  
-StatementList::StatementList(struct Entry **pentries, size_t number_entries) { 
+StatementList::StatementList(const struct Entry **pentries, size_t number_entries) { 
   for (size_t i = 0; i < number_entries; i++) {
     if (pentries[i] == NULL) {
       // Likely incorrect number_entries given 
@@ -156,8 +156,6 @@ boost::gregorian::date StatementList::getEndDate() const { return end_date; }
 
 
 StatementList StatementList::getDateRange(boost::gregorian::date start, boost::gregorian::date end) const {
-  // TODO: Handle incorrect date format given 
-  // gracefully handle incorrect statement date range
   StatementList result; 
   if (start > end) {
     perror("Please make sure start date is prior to end date\n"); 
@@ -167,12 +165,11 @@ StatementList StatementList::getDateRange(boost::gregorian::date start, boost::g
   start = start < start_date ? start_date : start;
   end = end > end_date ? end_date : end; 
 
-  // safe to assume argument date is within range (start_date, end_date)
   auto findClosestStartDate = [this](boost::gregorian::date date) {
     return list.lower_bound(date); 
     
   };
-  // functions seperate to allow end to be inclusive 
+  // seperate function for end date to allow end to be inclusive 
   auto findClosestEndDate =  [this](boost::gregorian::date date) {
     return list.upper_bound(date); 
   };

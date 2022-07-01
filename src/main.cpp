@@ -23,24 +23,8 @@
  * 
  *          An entry will have the format below -
  *          Date Amount Balance
- *
- *
- *
- *          TODO:
- *                1) Determine the statistics/output desired.
- *                2) Implement proper library for monetary calculations
- *                  - Current implentation uses trivial 'int'
- *
- *  Return: 0 represents successful operation, negative number indicates error in execution
- *
- */
-
-
-/*
- * Macro below represents the maximum line length of the input file.
- * On *nix systems the maximum line length of a file can be found by
- * running 'wc -L inputfile'. Replace that number+1(include space for null termination char)
- * with the MACRO value below.
+ *  
+ * Return: 0 represents successful operation, negative number indicates error in execution
  *
  */
 
