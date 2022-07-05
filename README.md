@@ -21,11 +21,7 @@ CREATE TABLE statements (
 );
 ```
 
-<<<<<<< HEAD
-The executable ```banking will still create its output file, but will fail when program execution begins for database operations.
-=======
 The executable ```banking``` will still create its output file, but will fail when program execution begins for database operations.
->>>>>>> dddf3a2 (Update README.md)
 
 Run the application: 
 
