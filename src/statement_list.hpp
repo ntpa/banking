@@ -14,16 +14,17 @@
 // Libraries not in standard
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/special_defs.hpp>
-#include "entry.h"
 
 class Statement {
   int amount{};
   int balance{};  
-  std::string date; 
+  std::string date{};
+  std::string description{};
 public: 
-  Statement(int amount, int balance, const std::string& date)
+  Statement(int amount, int balance, const std::string& date, const std::string& description)
   : amount{ amount }, balance { balance }
-  , date{ date } {}
+  , date{ date }
+  , description{ description } {}
   ~Statement() = default; 
   Statement() = default;
   Statement& operator=(const Statement& other) = default; 
@@ -34,18 +35,18 @@ public:
   int getAmount() const { return amount; }
   int getBalance() const { return balance; }
   std::string getDate() const { return date; } 
+  std::string getDescription() const { return description; }
 }; 
 
 
 class StatementList {
-  std::map<boost::gregorian::date, Statement> list;    
+  std::multimap<boost::gregorian::date, Statement> list;    
   boost::gregorian::date start_date{boost::date_time::special_values::max_date_time};
   boost::gregorian::date end_date{boost::date_time::special_values::min_date_time}; 
 public: 
-  explicit StatementList(const struct Entry **pentries, size_t number_entries); 
-  explicit StatementList(const std::vector<Statement>& statements); 
   StatementList() = default; 
   ~StatementList() = default; 
+  explicit StatementList(const std::vector<Statement>& statements); 
   StatementList(const StatementList& sl) = default;
   StatementList(StatementList&& sl) = delete; 
   StatementList& operator=(const StatementList& other) = delete; 
@@ -54,17 +55,13 @@ public:
 
   // Should this be a seperate class? 
   // Does this reveal too much about inner operation of class? 
-  const std::map<boost::gregorian::date, Statement>& getList() const;
-
-
-
+  const std::multimap<boost::gregorian::date, Statement>& getList() const;
   void addStatement(const Statement& statement); 
   /*
    * returns lower bound to given date
    * if given date is before statementlist range then return the 1st recorded statement
    * if given date is after statementlist range then return the last recorded statement
    */ 
-  Statement& operator[](boost::gregorian::date date);
   friend std::ostream& operator<<(std::ostream& os, const StatementList& sl); 
 
   std::optional<int> getAmount(boost::gregorian::date date) const;

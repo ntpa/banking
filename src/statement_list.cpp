@@ -13,37 +13,10 @@ static boost::gregorian::date fromUSDateToGregorianDate(const std::string date) 
 // Any statements added to StatementList pass through this function 
 void StatementList::addStatement(const Statement& statement) {
   auto gregorian_date = fromUSDateToGregorianDate(statement.getDate()); 
-    auto it = list.find(gregorian_date);
-    if (it != list.end()) {
-        /* balance remains unchanged because the first read balance 
-         * represents the sum balance from all statements on that date
-         */ 
-        int new_amount = (it->second).getAmount() + statement.getAmount(); 
-        Statement temp_statement(new_amount, (it->second).getBalance()
-                                , (it->second).getDate()); 
-        list[gregorian_date] = temp_statement;
-    }
-    else { /* New Date */ 
-      start_date = gregorian_date < start_date ? gregorian_date : start_date; 
-      end_date = gregorian_date > end_date ? gregorian_date : end_date;     
-  
-      // operator[] chosen over insert() and emplace() methods due to 
-      // std::pair bug in template conversion 
-      list[gregorian_date] = statement;
+  start_date = gregorian_date < start_date ? gregorian_date : start_date; 
+  end_date = gregorian_date > end_date ? gregorian_date : end_date;     
+  list.insert({gregorian_date, statement});
       
-    }
-}
- 
-StatementList::StatementList(const struct Entry **pentries, size_t number_entries) { 
-  for (size_t i = 0; i < number_entries; i++) {
-    if (pentries[i] == NULL) {
-      // Likely incorrect number_entries given 
-      break;
-    }
-    Statement statement(get_amount(pentries[i]), get_balance(pentries[i])
-                        , get_date(pentries[i])); 
-    this->addStatement(statement);
-  }
 }
 
 StatementList::StatementList(const std::vector<Statement>& statements) {
@@ -213,24 +186,15 @@ StatementList StatementList::getBalanceRange(int min, int max) const {
 void StatementList::printList() const {
   for (const auto& it : list) {
     std::cout << it.first << ' ' <<  (it.second).getAmount()
-    << ' ' << (it.second).getBalance() << '\n';
+    << ' ' << (it.second).getBalance() << (it.second).getDescription() << '\n';
   }
 }
 
-
-Statement& StatementList::operator[](boost::gregorian::date date) {
-  date = date < start_date ? start_date : date; 
-  date = date > end_date ? end_date : date; 
-
-  return (list.lower_bound(date))->second;
-}
-
-
 std::ostream& operator<<(std::ostream& os, const StatementList& sl) {
-  os << "#Date Amount Balance\n"; 
+  os << "#Date Amount Balance Description\n"; 
   for (const auto& entry : sl.list) {
     os << entry.first << ' ' << (entry.second).getAmount() << ' '
-    << (entry.second).getBalance() << '\n'; 
+    << (entry.second).getBalance() << (entry.second).getDescription() << '\n'; 
   }
   return os; 
 }
@@ -265,6 +229,6 @@ size_t StatementList::getNumWithdrawals() const {
   return numWithdrawals; 
 }
 
-const std::map<boost::gregorian::date, Statement>& StatementList::getList() const {
+const std::multimap<boost::gregorian::date, Statement>& StatementList::getList() const {
   return list;
 }; 
