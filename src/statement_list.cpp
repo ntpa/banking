@@ -191,10 +191,10 @@ void StatementList::printList() const {
 }
 
 std::ostream& operator<<(std::ostream& os, const StatementList& sl) {
-  os << "#Date Amount Balance Description\n"; 
+  os << "# Date Amount Description Balance\n"; 
   for (const auto& entry : sl.list) {
     os << entry.first << ' ' << (entry.second).getAmount() << ' '
-    << (entry.second).getBalance() << (entry.second).getDescription() << '\n'; 
+    << (entry.second).getBalance() << ' ' << (entry.second).getDescription() << '\n'; 
   }
   return os; 
 }
