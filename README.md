@@ -10,6 +10,19 @@ Assuming all files in src/ in the same directory compile and build executable in
 g++ -Wall -Wextra entry.c statement_list.cpp main.cpp -o bankingcpp
 ```
 
+Postgre back-end requires there to be a database on system with the table of the format below: 
+
+```sql
+CREATE TABLE statements (
+  date date PRIMARY KEY,
+  amount integer,
+  description text,
+  balance integer
+);
+```
+
+The executable ```banking will still create its output file, but will fail when program execution begins for database operations.
+
 Run the application: 
 
 ```
