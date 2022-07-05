@@ -236,12 +236,12 @@ std::ostream& operator<<(std::ostream& os, const StatementList& sl) {
 }
 
 
-int StatementList::getNumStatements() const {
+size_t StatementList::getNumStatements() const {
   return list.size(); 
 }
 
-int StatementList::getNumDeposits() const {
-  int numDeposits{0}; 
+size_t StatementList::getNumDeposits() const {
+  size_t numDeposits{0}; 
   for (const auto& entry : list) {
     const auto statement = entry.second; 
     // Include ZERO because implies that
@@ -254,8 +254,8 @@ int StatementList::getNumDeposits() const {
   return numDeposits; 
 }
 
-int StatementList::getNumWithdrawals() const {
-  int numWithdrawals{0}; 
+size_t StatementList::getNumWithdrawals() const {
+  size_t numWithdrawals{0}; 
   for (const auto& entry : list) {
     const auto statement = entry.second; 
     if (statement.getAmount() < 0) {
@@ -264,3 +264,7 @@ int StatementList::getNumWithdrawals() const {
   }
   return numWithdrawals; 
 }
+
+const std::map<boost::gregorian::date, Statement>& StatementList::getList() const {
+  return list;
+}; 

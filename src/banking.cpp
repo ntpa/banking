@@ -1,6 +1,9 @@
+#include <pqxx/pqxx>
+#include <sstream>
 #include "statement_list.hpp"
 #include "entry.h"
 #include "parser.hpp"
+#include "creds.hpp"
 
 // Author: Nathan Tadesse
 // Date: 06-19-22
@@ -24,7 +27,7 @@
  *          An entry will have the format below -
  *          Date Amount Balance
  *  
- * Return: 0 represents successful operation, negative number indicates error in execution
+ * Return: 0 represents successful operation, otherwise error in execution
  *
  */
 
@@ -51,16 +54,53 @@ int main(int argc, char *argv[]) {
     statementList.addStatement(statement); 
   } /* Read all rows in CSV file */ 
   
-  ofs << "======  " << statementList.getStartDate() << " - " << statementList.getEndDate() << " ======" << '\n';
-  ofs << "Number of statements: " << statementList.getNumStatements() << '\n'; 
-  ofs << "Number of deposits: " << statementList.getNumDeposits() << "  Number of withdrawals: " << statementList.getNumWithdrawals() << '\n'; 
-  ofs << "Max deposit: " << statementList.getMaxDeposit() << " happened on " << statementList.getMaxDepositDate() << '\n';
-  ofs << "Max withdrawal: " << statementList.getMaxWithdrawal() << " happened on " << statementList.getMaxWithdrawalDate() << '\n';
-  ofs << "Max balance: " << statementList.getMaxBalance() << " happened on " << statementList.getMaxBalanceDate() << '\n';
-  ofs << "Min balance: " << statementList.getMinBalance() << " happened on " << statementList.getMinBalanceDate() << '\n';
-  ofs << "===================================================" << '\n';  
   ofs << statementList;
 
+
+  // Postgre Database operations
+  try {
+    // TODO: Hide user, password and dbname
+    //       Continue operation on repeated values?
+    const auto list = statementList.getList();  
+    std::stringstream execStatement;
+    execStatement << "INSERT INTO statements VALUES";
+    // Construct one multiple insert statement to avoid transaction closing errors
+    size_t counter{0}; 
+    for (const auto& entry : list) {  
+      // Would have to escape data if taking from 
+      // non-trusted input. However I am personally executing statements 
+      const auto statement = entry.second; 
+      const auto amount = std::to_string(statement.getAmount());
+      const auto balance = std::to_string(statement.getBalance()); 
+      execStatement << " ("; 
+      execStatement << "\'" << boost::gregorian::to_simple_string(entry.first); 
+      execStatement << "\'" << ", ";
+      execStatement << std::to_string(statement.getAmount()) << ", ";
+
+      // End properly on final value
+      if (counter == statementList.getNumStatements() - 1) {
+        execStatement << std::to_string(statement.getBalance()) << ");"; 
+      }
+      else {
+        execStatement <<  std::to_string(statement.getBalance()) <<  "),";
+      }
+      counter++; 
+    }
+    // Wait to start connection to avoid timeout during above generation
+    std::stringstream credentials; 
+    credentials << "user=" << Credentials::user;
+    credentials << " password=" << Credentials::password;
+    credentials << " dbname=" << Credentials::dbName; 
+    pqxx::connection c(credentials.str());
+    pqxx::nontransaction w(c); // allows multiple exec()
+    pqxx::result r = w.exec(execStatement);
+    w.commit();
+  }
+  catch (std::exception const &e) {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
+
   ifs.close(); 
-  ofs.close(); 
+  ofs.close();
 }

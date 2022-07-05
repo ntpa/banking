@@ -51,6 +51,13 @@ public:
   StatementList& operator=(const StatementList& other) = delete; 
   StatementList& operator=(StatementList&& other) = delete; 
   
+
+  // Should this be a seperate class? 
+  // Does this reveal too much about inner operation of class? 
+  const std::map<boost::gregorian::date, Statement>& getList() const;
+
+
+
   void addStatement(const Statement& statement); 
   /*
    * returns lower bound to given date
@@ -72,9 +79,9 @@ public:
    * so the methods below will not sum to the total number of 
    * statements in the input .csv file
    */  
-  int getNumStatements() const; 
-  int getNumDeposits() const; 
-  int getNumWithdrawals() const; 
+  size_t getNumStatements() const; 
+  size_t getNumDeposits() const; 
+  size_t getNumWithdrawals() const; 
 
   boost::gregorian::date getMaxDepositDate() const;
   boost::gregorian::date getMaxWithdrawalDate() const;
