@@ -71,12 +71,19 @@ int main(int argc, char *argv[]) {
 
   // Postgre Database operations
   try {
+
+    
+
+
     const auto list = statementList.getList();  
     std::stringstream execStatement;
+    // Crude way to prevent duplicate INSERT 
+    // TODO: Conditional INSERT(if values does not exist)
+    execStatement << "DELETE FROM statements;";
     execStatement << "INSERT INTO statements VALUES";
     // Construct one multiple insert statement to avoid transaction closing errors
     size_t counter{0}; 
-    for (const auto& entry : list) {  
+    for (const auto& entry : list) { 
       Statement statement = entry.second; 
       execStatement << " ( \'";
       execStatement << boost::gregorian::to_simple_string(entry.first);
@@ -102,8 +109,7 @@ int main(int argc, char *argv[]) {
     credentials << " dbname=" << Credentials::dbName; 
     pqxx::connection c(credentials.str());
     pqxx::nontransaction w(c); // transactional integrity not require   
-
-    // Only safe for 'trusted' statements
+  
     pqxx::result r = w.exec(execStatement);
     w.commit();
   }
