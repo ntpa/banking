@@ -14,10 +14,10 @@ Postgre back-end requires there to be a database on system with the table of the
 
 ```sql
 CREATE TABLE statements (
-  date date PRIMARY KEY,
-  amount integer,
-  description text,
-  balance integer
+  date date NOT NULL,
+  amount integer NOT NULL,
+  description text NOT NULL,
+  balance integer NOT NULL
 );
 ```
 
