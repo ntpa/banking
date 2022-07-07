@@ -1,16 +1,26 @@
-# banking
+# Banking
 
 **Capital One bank statements (.csv) analyzer.**
 
-Please remove the header from your .csv file. 
+#### Dependencies
 
-Assuming all files in src/ in the same directory compile and build executable in Linux(**Debian**) with:
+- Postgres SQL: Version 14 >=
+  - libpxx [Official C++ client API for PostgreSQL](pqxx.org/)
 
+#### Requirements
+
+- Please remove the header from your .csv file.
+- Please include your Postgres Database credentials in a file named ```creds.hpp```
+
+```cpp
+namespace Credentials {
+  const std::string user{<DatabaseUser>};
+  const std::string password{<DatabaseUserPassword>};
+  const std::string dbName{<DatabaseName>};
+};
 ```
-g++ -Wall -Wextra entry.c statement_list.cpp main.cpp -o bankingcpp
-```
 
-Postgre back-end requires there to be a database on system with the table of the format below: 
+- Postgre back-end requires there to be a database on system with the table of the format below:
 
 ```sql
 CREATE TABLE statements (
@@ -21,17 +31,22 @@ CREATE TABLE statements (
 );
 ```
 
-The executable ```banking``` will still create its output file, but will fail when program execution begins for database operations.
-
-Run the application: 
+Assuming all files in src/ in the same directory compile and build executable in Linux(**Debian**) with:
 
 ```
-./bankingcpp <csv_file_path> <output_file_path> 
+g++ -Wall -Wextra -lpqxx -lpq statement_list.cpp main.cpp -o <executable>
 ```
 
+The executable will create its output file, but will fail when program execution begins
+for database operations.
 
-Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach out. 
+**Run the application:**
 
+```
+./<executable> <csv_file_path> <output_file_path>
+```
+
+Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach out!
 
 ***This application is not endorsed by Capital One***
 
