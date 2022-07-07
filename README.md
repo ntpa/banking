@@ -31,22 +31,25 @@ CREATE TABLE statements (
 );
 ```
 
+> The executable will create its output file, but will fail when program execution begins if *database and credenetials are not properly instantiated.*
+
 Assuming all files in src/ in the same directory compile and build executable in Linux(**Debian**) with:
 
 ```
 g++ -Wall -Wextra -lpqxx -lpq statement_list.cpp main.cpp -o <executable>
 ```
 
-The executable will create its output file, but will fail when program execution begins
-for database operations.
-
 **Run the application:**
+
 
 ```
 ./<executable> <csv_file_path> <output_file_path>
 ```
 
-Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach out!
+Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach o
+ut!
+
 
 ***This application is not endorsed by Capital One***
+
 
