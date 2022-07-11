@@ -46,8 +46,7 @@ g++ -Wall -Wextra -lpqxx -lpq statement_list.cpp main.cpp -o <executable>
 ./<executable> <csv_file_path> <output_file_path>
 ```
 
-Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach o
-ut!
+Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach out!
 
 
 ***This application is not endorsed by Capital One***
