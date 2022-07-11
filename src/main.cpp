@@ -29,8 +29,8 @@
  */
 
 int main(int argc, char *argv[]) {
-  if (argc != 3) {
-    perror("Usage: <executable> <input-file> <output-file>\n"); 
+  if (argc != 4) {
+    perror("Usage: <executable> <input-file> <output-file> <table-name> \n"); 
     return -1; 
   }
  
@@ -67,47 +67,53 @@ int main(int argc, char *argv[]) {
   ifs.close(); 
   ofs.close();
 
-  // Postgre Database operations
-  try {
-    const auto list = statementList.getList();  
-    std::stringstream execStatement;
-    // Crude way to prevent duplicate INSERT 
-    execStatement << "DELETE FROM statements;";
-    execStatement << "INSERT INTO statements VALUES";
-    // Construct one multiple insert statement to avoid transaction closing errors
-    size_t counter{0}; 
-    for (const auto& entry : list) { 
-      Statement statement = entry.second; 
-      execStatement << " ( \'";
-      execStatement << boost::gregorian::to_simple_string(entry.first);
-      execStatement << "\', ";
-      execStatement << std::to_string(statement.getAmount());
-      execStatement <<  ", ";
-      execStatement << "\'" << statement.getDescription() << "\'"; 
-      execStatement << ", "; 
-      // End properly on final value
-      if (counter == statementList.getNumStatements() - 1) {
-        execStatement << std::to_string(statement.getBalance()) << ");"; 
+  const std::string tableName = argv[3]; 
+  if (tableName != "NOTABLE") {
+    // Postgre Database operations
+    try {
+      const auto list = statementList.getList();  
+      std::stringstream execStatement;
+      // Crude way to prevent duplicate INSERT 
+      execStatement << "DELETE FROM " << tableName << ";";
+      execStatement << "INSERT INTO " << tableName << " VALUES";
+      // Construct one multiple insert statement to avoid transaction closing errors
+      size_t counter{0}; 
+      for (const auto& entry : list) { 
+        Statement statement = entry.second; 
+        execStatement << " ( \'";
+        execStatement << boost::gregorian::to_simple_string(entry.first);
+        execStatement << "\', ";
+        execStatement << std::to_string(statement.getAmount());
+        execStatement <<  ", ";
+        execStatement << "\'" << statement.getDescription() << "\'"; 
+        execStatement << ", "; 
+        // End properly on final value
+        if (counter == statementList.getNumStatements() - 1) {
+          execStatement << std::to_string(statement.getBalance()) << ");"; 
+        }
+        else {
+          execStatement <<  std::to_string(statement.getBalance()) <<  "),";
+        }
+        counter++; 
       }
-      else {
-        execStatement <<  std::to_string(statement.getBalance()) <<  "),";
-      }
-      counter++; 
+      // Wait to start connection to avoid timeout during above generation
+      std::stringstream credentials; 
+      credentials << "user=" << Credentials::user;
+      credentials << " password=" << Credentials::password;
+      credentials << " dbname=" << Credentials::dbName; 
+      pqxx::connection c(credentials.str());
+      pqxx::nontransaction w(c); // transactional integrity not require   
+    
+      pqxx::result r = w.exec(execStatement);
+      w.commit();
     }
-    // Wait to start connection to avoid timeout during above generation
-    std::stringstream credentials; 
-    credentials << "user=" << Credentials::user;
-    credentials << " password=" << Credentials::password;
-    credentials << " dbname=" << Credentials::dbName; 
-    pqxx::connection c(credentials.str());
-    pqxx::nontransaction w(c); // transactional integrity not require   
-  
-    pqxx::result r = w.exec(execStatement);
-    w.commit();
-  }
-  catch (std::exception const &e) {
-    std::cerr << e.what() << std::endl;
-    return 1;
+    catch (std::exception const &e) {
+      std::cerr << e.what() << std::endl;
+      std::cerr << "Please check that the correct table name is given"
+                   " and that the Postgre server is initialized.\n"
+                   "Refer to https://www.postgresql.org/docs/current/tutorial-createdb.html for help\n"; 
+      return 1;
+    }
   }
 
 }

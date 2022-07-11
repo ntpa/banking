@@ -184,9 +184,9 @@ StatementList StatementList::getBalanceRange(int min, int max) const {
 
 
 void StatementList::printList() const {
-  for (const auto& it : list) {
-    std::cout << it.first << ' ' <<  (it.second).getAmount()
-    << ' ' << (it.second).getBalance() << (it.second).getDescription() << '\n';
+  for (const auto& entry : list) {
+    std::cout << entry.first << ' ' <<  (entry.second).getAmount() << ' ' 
+    << (entry.second).getDescription() << ' ' << (entry.second).getBalance() << '\n';
   }
 }
 
@@ -194,7 +194,7 @@ std::ostream& operator<<(std::ostream& os, const StatementList& sl) {
   os << "# Date Amount Description Balance\n"; 
   for (const auto& entry : sl.list) {
     os << entry.first << ' ' << (entry.second).getAmount() << ' '
-    << (entry.second).getBalance() << ' ' << (entry.second).getDescription() << '\n'; 
+    << (entry.second).getDescription() << ' ' << (entry.second).getBalance() << '\n'; 
   }
   return os; 
 }

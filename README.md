@@ -23,7 +23,7 @@ namespace Credentials {
 - Postgre back-end requires there to be a database on system with the table of the format below:
 
 ```sql
-CREATE TABLE statements (
+CREATE TABLE <table_name> (
   date date NOT NULL,
   amount integer NOT NULL,
   description text NOT NULL,
@@ -43,8 +43,10 @@ g++ -Wall -Wextra -lpqxx -lpq -I/<include_path> statement_list.cpp main.cpp -o <
 
 
 ```
-./<executable> <csv_file_path> <output_file_path>
+./<executable> <csv_file_path> <output_file_path> <table_name> 
 ```
+
+> If you do not desire back-end support, please use *"NOTABLE" for your <table_name>*, and the application will skip database operations. 
 
 Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach out!
 
