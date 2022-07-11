@@ -29,7 +29,8 @@ CREATE TABLE <table_name> (
   description text NOT NULL,
   balance integer NOT NULL
 );
-`
+````
+
 #### Security
 
 For remote operation on untrusted networks, it is recommended to select a more secure option for client authentication than the defaults in ```pga_hba.conf```
@@ -38,8 +39,6 @@ Please refer to [Client Authentication](https://www.postgresql.org/docs/current/
 
 #### Executable operation
 
-``
-
 > The executable will create its output file, but will fail when program execution begins if *database and credenetials are not properly instantiated.*
 
 Assuming all files in src/ in the same directory compile and build executable in Linux(**Debian**) with:
@@ -47,9 +46,6 @@ Assuming all files in src/ in the same directory compile and build executable in
 ```
 g++ -Wall -Wextra -lpqxx -lpq -I/<include_path> statement_list.cpp main.cpp -o <executable>
 ```
-
-**Run the application:**
-
 
 ```
 ./<executable> <csv_file_path> <output_file_path> <table_name> 
