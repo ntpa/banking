@@ -3,29 +3,27 @@
 #include "statement_list.hpp"
 #include "parser.hpp"
 #include "creds.hpp"
-
-// Author: Nathan Tadesse
-// Date: 06-19-22
-// Filename: main.cpp
-
-
-
-
-/*
+ /*
+ * Author: Nathan Tadesse
+ * Date: 06-19-22
+ * Filename: main.cpp
+ *
  * main() - takes in space seperated file which represents Capital One Bank Statements from certain time period
- *          and creates a .dat file for gnuplot usage. 
+ *          and sends data to backend server, as well as a standard text file . 
  *
  * @argc: number of command line arguments
  * @argv: the strings representing command line arguments. Expects a filename that points to a
- *        csv file of the representation in description, and an output file specifier for the .dat file
+ *        csv file of the representation in description, and an output file specifier for the .txt file
  *
  *  Description:
  *          Given an input file that references a file containing a Capital One Bank Statement
- *          main() will traverse the file and combine all entries that happened on the same date.
- * 
+ *          main() will send data to backend server specified and create an output file of the format below: 
+ *
  *          An entry will have the format below -
  *          Date Amount Balance
  *  
+ *          Server and text file will have the same above representation
+ *
  * Return: 0 represents successful operation, otherwise error in execution
  *
  */
@@ -71,14 +69,9 @@ int main(int argc, char *argv[]) {
 
   // Postgre Database operations
   try {
-
-    
-
-
     const auto list = statementList.getList();  
     std::stringstream execStatement;
     // Crude way to prevent duplicate INSERT 
-    // TODO: Conditional INSERT(if values does not exist)
     execStatement << "DELETE FROM statements;";
     execStatement << "INSERT INTO statements VALUES";
     // Construct one multiple insert statement to avoid transaction closing errors
@@ -90,7 +83,6 @@ int main(int argc, char *argv[]) {
       execStatement << "\', ";
       execStatement << std::to_string(statement.getAmount());
       execStatement <<  ", ";
-      
       execStatement << "\'" << statement.getDescription() << "\'"; 
       execStatement << ", "; 
       // End properly on final value

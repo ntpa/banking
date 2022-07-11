@@ -11,7 +11,6 @@
 #include <regex>
 #include <fstream> 
 #include <cstdlib>
-// Libraries not in standard
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/special_defs.hpp>
 
@@ -52,7 +51,6 @@ public:
   StatementList& operator=(const StatementList& other) = delete; 
   StatementList& operator=(StatementList&& other) = delete; 
   
-
   // Should this be a seperate class? 
   // Does this reveal too much about inner operation of class? 
   const std::multimap<boost::gregorian::date, Statement>& getList() const;
