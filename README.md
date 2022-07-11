@@ -1,6 +1,6 @@
 # Banking
 
-**Capital One bank statements (.csv) analyzer.**
+**Capital One bank statement logger**
 
 #### Dependencies
 
@@ -48,7 +48,7 @@ g++ -Wall -Wextra -lpqxx -lpq -I/<include_path> statement_list.cpp main.cpp -o <
 
 > If you do not desire back-end support, please use *"NOTABLE" for your <table_name>*, and the application will skip database operations. 
 
-Please stay tuned. If you wish to contribute, or recommend implementations please do not hesitate to reach out!
+Please stay tuned. If you wish to contribute, or recommend implementations(especially if you can recommend a better name for the project) please do not hesitate to reach out!
 
 
 ***This application is not endorsed by Capital One***
