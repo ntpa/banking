@@ -24,10 +24,11 @@ namespace Credentials {
 
 ```sql
 CREATE TABLE <table_name> (
-  date date NOT NULL,
-  amount integer NOT NULL,
-  description text NOT NULL,
-  balance integer NOT NULL
+  date date,
+  amount integer,
+  description text,
+  balance integer,
+  PRIMARY KEY (date, amount, description, balance)
 );
 ````
 
