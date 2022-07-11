@@ -39,7 +39,7 @@ Please refer to [Client Authentication](https://www.postgresql.org/docs/current/
 
 #### Executable operation
 
-> The executable will create its output file, but will fail when program execution begins if *database and credenetials are not properly instantiated.*
+> The executable will create its output file, but will fail when program execution begins if *database and credentials are not properly instantiated.*
 
 Assuming all files in src/ in the same directory compile and build executable in Linux(**Debian**) with:
 
