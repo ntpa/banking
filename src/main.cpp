@@ -98,8 +98,8 @@ int main(int argc, char *argv[]) {
       }
       // Wait to start connection to avoid timeout during above generation
       std::stringstream credentials; 
-      credentials << "user=" << Credentials::user;
-      credentials << " password=" << Credentials::password;
+      credentials << "user=" << Credentials::username;
+      credentials << " password=" << Credentials::password; 
       credentials << " dbname=" << Credentials::dbName; 
       pqxx::connection c(credentials.str());
       pqxx::nontransaction w(c); // transactional integrity not require   

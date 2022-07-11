@@ -29,7 +29,16 @@ CREATE TABLE <table_name> (
   description text NOT NULL,
   balance integer NOT NULL
 );
-```
+`
+#### Security
+
+For remote operation on untrusted networks, it is recommended to select a more secure option for client authentication than the defaults in ```pga_hba.conf```
+
+Please refer to [Client Authentication](https://www.postgresql.org/docs/current/client-authentication.html) and [Server Configuration](https://www.postgresql.org/docs/current/runtime-config.html) for more details. 
+
+#### Executable operation
+
+``
 
 > The executable will create its output file, but will fail when program execution begins if *database and credenetials are not properly instantiated.*
 
