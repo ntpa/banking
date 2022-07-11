@@ -36,7 +36,7 @@ CREATE TABLE statements (
 Assuming all files in src/ in the same directory compile and build executable in Linux(**Debian**) with:
 
 ```
-g++ -Wall -Wextra -lpqxx -lpq statement_list.cpp main.cpp -o <executable>
+g++ -Wall -Wextra -lpqxx -lpq -I/<include_path> statement_list.cpp main.cpp -o <executable>
 ```
 
 **Run the application:**
