@@ -56,7 +56,7 @@ with open (sys.argv[1], 'r', encoding="utf-8") as csvfile:
         total_transactions += 1
 
         
-print("\nTotal of {total_transactions} transactions from {start_date} to {end_date}")
+print(f"\nTotal of {total_transactions} transactions from {start_date} to {end_date}")
 print("Breakdown:")
 
 print(f'\t{number_deposits} deposits for a total of {"{:,}".format(remove_exponent(total_deposit_amount))} USD',
