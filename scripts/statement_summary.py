@@ -42,7 +42,13 @@ with open (sys.argv[1], 'r', encoding="utf-8") as csvfile:
 
     for row in csv_reader: 
         # Date Summary
-        statement_date = date.fromisoformat(row[1])
+        try: 
+            statement_date = date.fromisoformat(row[1])
+        except ValueError as err:
+            print(err)
+            print("Perhaps CSV header found --> Remove header")
+            print("Perhaps transaction date(s) are not formatted properly --> Run input file through merge_statements.py")
+            exit()
         start_date = statement_date if start_date > statement_date else start_date
         end_date = statement_date if end_date < statement_date else end_date
         # Deposit/Withdrawal Summary
