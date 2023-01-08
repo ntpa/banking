@@ -1,9 +1,15 @@
 use v5.24;
 use Text::ASCIITable;
+use Number::Format qw(:subs); 
 
 my %transactions;
 my $longest = 0;
+my $total_deposit_amount = 0;
+my $total_withdrawal_amount = 0;
 
+# Do not change these values
+use constant COUNT => 0;
+use constant TOTAL_AMOUNT => 1;
 while (<>) {
   chomp;
   # retrieve fields
@@ -30,14 +36,14 @@ while (<>) {
 
     if (exists $transactions{$description}) {
       # number transactions
-      $transactions{$description}[0]++; 
+      $transactions{$description}[COUNT]++; 
       # total amount 
-      $transactions{$description}[1] += $amount;
+      $transactions{$description}[TOTAL_AMOUNT] += $amount;
     }
     else {
       # run more filtering
-      $transactions{$description}[0] = 1;
-      $transactions{$description}[1] = $amount;
+      $transactions{$description}[COUNT] = 1;
+      $transactions{$description}[TOTAL_AMOUNT] = $amount;
     }
   
   # get longest description for concluding format
@@ -52,13 +58,22 @@ while (<>) {
 
 
 my $t = Text::ASCIITable->new({ headingText => 'Transaction Summary' });
-$t->setCols('Transaction Description', 'Total Transactions', 'Total Amount');
+$t->setCols('Transaction Description', 'Total Transactions', 'Total Amount(USD)', 'Average Amount(USD)');
+
+# Wait as long as you can to format monetary numbers
+
 
 # sort descending order
-foreach my $key (sort { $transactions{$b}[0] <=> $transactions{$a}[0] } keys %transactions) {
+foreach my $key (sort { $transactions{$b}[COUNT] <=> $transactions{$a}[COUNT] } keys %transactions) {
   # printf "%-${longest}s: %d for %d\n", $key, $transactions{$key}[0], $transactions{$key}[1];
-  $t->addRow($key, $transactions{$key}[0], $transactions{$key}[1]);
+  $t->addRow($key, $transactions{$key}[COUNT], format_number($transactions{$key}[TOTAL_AMOUNT],2),
+    format_number($transactions{$key}[TOTAL_AMOUNT]/$transactions{$key}[COUNT],2,1));
 }
+
+# Totals 
+# $t->addRowLine();
+# $t->addRow('Total Deposits', $total_deposit_number, $total_deposit_amount);
+# $t->addRow('Total Withdrawals', $total_withdrawal_number, $total_withdrawal_amount);
 
 print $t;
 
