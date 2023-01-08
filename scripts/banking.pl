@@ -10,6 +10,9 @@ my $total_withdrawal_amount = 0;
 # Do not change these values
 use constant COUNT => 0;
 use constant TOTAL_AMOUNT => 1;
+my $DEPOSITS = 'DEPOSITS';
+my $WITHDRAWALS = 'WITHDRAWALS';
+
 while (<>) {
   chomp;
   # retrieve fields
@@ -33,7 +36,6 @@ while (<>) {
     # 2) Group 'Digital Card' and 'Debit Card' Purchases
     $description =~ s/(Debit|Digital).* - //;
 
-
     if (exists $transactions{$description}) {
       # number transactions
       $transactions{$description}[COUNT]++; 
@@ -49,6 +51,16 @@ while (<>) {
   # get longest description for concluding format
   my $description_length = length( $description );
   $longest = $description_length if $description_length > $longest; 
+
+  # Deposit/Withdrawals Totals
+  if ($amount > 0) {
+    $transactions{$DEPOSITS}[COUNT]++;
+    $transactions{$DEPOSITS}[TOTAL_AMOUNT] += $amount; 
+  }
+  else {
+    $transactions{$WITHDRAWALS}[COUNT]++;
+    $transactions{$WITHDRAWALS}[TOTAL_AMOUNT] += $amount;
+  }
 
   } else {
    die "CSV file contains line with incorrect format: $!"
@@ -71,9 +83,13 @@ foreach my $key (sort { $transactions{$b}[COUNT] <=> $transactions{$a}[COUNT] } 
 }
 
 # Totals 
-# $t->addRowLine();
-# $t->addRow('Total Deposits', $total_deposit_number, $total_deposit_amount);
-# $t->addRow('Total Withdrawals', $total_withdrawal_number, $total_withdrawal_amount);
+$t->addRowLine();
+$t->addRow('Deposits', $transactions{$DEPOSITS}[COUNT],
+  format_number($transactions{$DEPOSITS}[TOTAL_AMOUNT]),
+  format_number($transactions{$DEPOSITS}[TOTAL_AMOUNT]/$transactions{$DEPOSITS}[COUNT]));
+$t->addRow('Withdrawals', $transactions{$WITHDRAWALS}[COUNT],
+  format_number($transactions{$WITHDRAWALS}[TOTAL_AMOUNT]),
+  format_number($transactions{$WITHDRAWALS}[TOTAL_AMOUNT]/$transactions{$WITHDRAWALS}[COUNT]));
 
 print $t;
 
